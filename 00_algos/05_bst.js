@@ -88,14 +88,107 @@ class Tree {
         else {
             prev.left = node;
         }
+    }
 
+    //Write a find(value) function that returns the node with the given value.
+
+    find(n, returnPrev = false) {
+        let current = this.root;
+        let prev = null;
+        while (current != null && current.data != n) {
+            prev = current;
+            //console.log(current.data);
+            if (n < current.data) {
+                current = current.left;
+            }
+            else {
+                current = current.right;
+            }
+        }
+        if (current == null)
+            return null;
+        else if (current.data == n) {
+            return (!returnPrev) ? current : prev;
+        }
+        return null;
+    }
+
+    delete(n) {
+        let current = this.find(n);
+        //console.log(`find(${n}): ${current}`);
+        if (current == null)
+            return;
+
+        let prev = this.find(n, true);
+        let isRoot = (prev == null);
+
+
+        //let pointingRight = (prev.data < current.data);
+        
+        // lone leaf node
+        if (current.left == null && current.right == null) {
+            if (isRoot)
+                this.root = null;
+            else {
+                if (prev.data < current.data)
+                    prev.right = null;
+                else
+                    prev.left = null;
+            }
+        }
+        // one child
+        else if (current.left == null) {
+            if (isRoot) {
+                this.root = current.right;
+            }
+            else {
+                if (prev.data < current.data)
+                    prev.right = current.right;
+                else
+                    prev.left = current.right;
+            }
+        }
+        else if (current.right == null) {
+            if (isRoot) {
+                this.root = current.left;
+            }
+            else {
+                //((prev.data < current.data) ? prev.right : prev.left) = current.left;
+                if (prev.data < current.data)
+                    prev.right = current.left;
+                else
+                    prev.left = current.left;
+            }
+        }
+        // two children
+        // in this case, explore the right branch of the deleted node, find the leftmost node L, and replace the deleted note with L 
+        else {
+            let lowest = current.right;
+            let lowestPrev = null;
+            while (lowest.left != null) {
+                lowestPrev = lowest;
+                lowest = lowest.left;
+            }
+
+            if (lowestPrev != null) {
+                lowestPrev.left = lowest.right;
+                lowest.right = current.right;
+            }
+            lowest.left = current.left;
+
+            if (isRoot) {
+                this.root = lowest;
+            }
+            else {
+                ((prev.data < current.data) ? prev.right : lowest)
+            }
+        }
     }
 
     isBalanced (root) {
         if (root == null)
             return true;
         return ((Math.abs((this.getMaxDepth(root.left) - this.getMaxDepth(root.right))) <= 1) && this.isBalanced(root.left) && this.isBalanced(root.right));
-        return false;
     }
 
     getMaxDepth(node) {
@@ -111,6 +204,32 @@ class Tree {
      
 }
 
+const randomIntArrayInRange = (min, max, n = 1) =>
+    Array.from(
+      { length: n },
+      () => Math.floor(Math.random() * (max - min + 1)) + min
+    );
+  
+
+for (let i = 0; i < 3; i++) {
+    let arr = randomIntArrayInRange(0, 100, (Math.floor(Math.random() * 15)));
+    console.log(arr);
+    let t = new Tree(arr);
+    t.prettyPrint(t.root);
+    
+    while (t.root != null) {
+        t.delete(t.root.data);
+        //t.prettyPrint(t.root);
+    }
+    t.prettyPrint(t.root);
+    
+}
+
+
+
+
+
+/*
 let t = new Tree([3, 2, 1]);
 t.prettyPrint(t.root);
 console.log(t.isBalanced(t.root));
@@ -128,6 +247,29 @@ t.insert(1.5);
 t.prettyPrint(t.root);
 console.log(t.isBalanced(t.root));
 
+console.log(t.find(7));
+t.delete(7);
+console.log(t.find(7));
+t.prettyPrint(t.root);
+t.delete(2);
+t.prettyPrint(t.root);
+
+t.delete(2.5);
+t.prettyPrint(t.root);
+t.delete(3);
+t.prettyPrint(t.root);
+t.delete(1);
+t.prettyPrint(t.root);
+t.delete(1);
+t.prettyPrint(t.root);
+t.delete(1);
+t.prettyPrint(t.root);
+
+
+//console.log(t.find(1));
+*/
+/*
 t = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 t.prettyPrint(t.root);
 console.log(t.isBalanced(t.root));
+*/
