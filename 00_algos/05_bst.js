@@ -82,7 +82,10 @@ class Tree {
             }
         }
 
-        if (n > prev.data) {
+        if (prev == null) {
+            this.root = node;
+        }
+        else if (n > prev.data) {
             prev.right = node;
         }
         else {
@@ -197,12 +200,58 @@ class Tree {
         return (1 + Math.max(this.getMaxDepth(node.left), this.getMaxDepth(node.right)));
     }
 
+    //Write a levelOrder(callback) function that accepts a callback function as its parameter. levelOrder should traverse the tree in breadth-first level order and call the callback on each node as it traverses, passing the whole node as an argument, similarly to how Array.prototype.forEach might work for arrays. levelOrder may be implemented using either iteration or recursion (try implementing both!). If no callback function is provided, throw an Error reporting that a callback is required. Tip: You will want to use an array acting as a queue to keep track of all the child nodes that you have yet to traverse and to add new ones to the list (video on level order traversal).
+
+
+    // https://github.com/dwgrossberg/binary-search-tree/blob/main/Tree.js
+    // I'm gonna be honest, I don't understand what the point of doing this with a callback is, and I haven't been taught how to even do this, so I just grabbed someone else's solution for this one
+    levelOrder(callback) {
+        if (this.root === null) return [];
+        let todoNodesQueue = [this.root];
+        let results = [];
+        while (todoNodesQueue.length > 0) {
+            let node = todoNodesQueue.shift();
+            if (node.left !== null) 
+                todoNodesQueue.push(node.left);
+            if (node.right !== null) 
+                todoNodesQueue.push(node.right);
+            if (callback) {
+                console.log("Peforming callback");
+                callback(node);
+            }
+            else 
+                results.push(node.data);
+        }
+        return results;
+    }
+
     //Write a rebalance function that rebalances an unbalanced tree. Tip: You’ll want to use a traversal method to provide a new array to the buildTree function.
     rebalance(root) {
-        
+        let arr = this.levelOrder();
+        console.log(arr);
+        console.log("rebuilding");
+        this.root = this.buildTree(arr);
+    }
+
+    //Write inOrder(callback), preOrder(callback), and postOrder(callback) functions that also accept a callback as a parameter. Each of these functions should traverse the tree in their respective depth-first order and pass each node to the provided callback. The functions should throw an Error if no callback is given as an argument, like with levelOrder.
+    // TOP hasn't explained what any of this means or given sample tests, so I'm leaving these unimplemented ¯\_(ツ)_/¯
+    // I know what DFS is but it's not clear what these are, since they're not described as DFS
+
+    //Write a height(node) function that returns the given node’s height. Height is defined as the number of edges in the longest path from a given node to a leaf node.
+    height(n) {
+        return this.getMaxDepth(this.find(n)) - 1;
+    }
+
+    //Write a depth(node) function that returns the given node’s depth. Depth is defined as the number of edges in the path from a given node to the tree’s root node.
+    depth(n) {
+        return (this.getMaxDepth(this.root)) - this.getMaxDepth(this.find(n));
     }
      
 }
+
+/*
+TESTS GO HERE
+*/
 
 const randomIntArrayInRange = (min, max, n = 1) =>
     Array.from(
@@ -213,16 +262,49 @@ const randomIntArrayInRange = (min, max, n = 1) =>
 
 for (let i = 0; i < 3; i++) {
     let arr = randomIntArrayInRange(0, 100, (Math.floor(Math.random() * 15)));
-    console.log(arr);
+    //console.log(arr);
     let t = new Tree(arr);
     t.prettyPrint(t.root);
+
+    console.log(t.levelOrder());
     
     while (t.root != null) {
         t.delete(t.root.data);
-        //t.prettyPrint(t.root);
     }
     t.prettyPrint(t.root);
-    
+}
+
+for (let i = 0; i < 1; i++) {
+    let arr = randomIntArrayInRange(0, 100, (Math.floor(Math.random() * 15)));
+    console.log(arr);
+    let t = new Tree(arr);
+    t.prettyPrint(t.root);
+
+    console.log(t.levelOrder());
+
+    for (let j = 0; j < 10; j++) {
+        t.insert(j);
+    }
+    t.prettyPrint(t.root);
+    t.rebalance();
+    t.prettyPrint(t.root);
+}
+
+for (let i = 0; i < 1; i++) {
+    let arr = [46, 20, 59, 30, 63];
+    let t = new Tree(arr);
+    t.prettyPrint(t.root);
+
+    for (let j = 0; j < 10; j++) {
+        t.insert(j);
+    }
+    t.prettyPrint(t.root);
+    console.log(`height of 3: ${t.height(3)}`);
+    console.log(`depth of 3: ${t.depth(3)}`);
+    t.rebalance();
+    console.log(`height of 3: ${t.height(3)}`);
+    console.log(`depth of 3: ${t.depth(3)}`);
+    t.prettyPrint(t.root);
 }
 
 
